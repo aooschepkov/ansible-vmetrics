@@ -1,0 +1,22 @@
+[Unit]
+Description=Victoria Metrics agent
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker rm --force vmagent
+ExecStart=/usr/bin/docker run --rm \
+    -n vmagent \
+    -u {{ vmuser }} \
+    -p {{ vmagent.listen_port }}:8429 \
+    -v {{ vmagent.host_dir }}:/data \
+    {{ vmagent.image }} \ 
+    -promscrape.config=/data/scrapeconfigs.yml \
+    -remoteWrite.url=https://vmstorage:8428/api/v1/write {# or vminsert uri ?? #}
+
+ExecStop=/usr/bin/docker stop -t 10 vmagent
+{# ExecReload= #}
+
+[Install]
+WantedBy=multu-user.target

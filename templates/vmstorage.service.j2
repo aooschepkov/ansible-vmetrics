@@ -1,0 +1,21 @@
+[Unit]
+Description=Victoria Metrics component
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker rm --force vmstorage
+ExecStart=/usr/bin/docker run --rm \
+    -n vmstorage \
+    -u {{ vmuser }} \
+    -p {{ vmstorage.listen_port }}:8428 \
+    -v {{ vmstorage.host_dir }}:/data \
+    {{ vmstorage.image }} \ 
+    -retentionPeriod {{ vmstorage.retention_period }}
+
+ExecStop=/usr/bin/docker stop -t 10 vmstorage
+{# ExecReload= #}
+
+[Install]
+WantedBy=multu-user.target

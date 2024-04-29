@@ -1,0 +1,25 @@
+---
+vmuser: victoriametrics
+vmgroup: victoriametrics
+
+vmstorage:
+  image: victoriametrics/vmstorage:v1.99.0-cluster
+  host_dir: /data/vmstorage
+  retention_period: 30d
+  listen_port: 8428
+
+vmagent:
+  image: victoriametrics/vmagent:v1.99.0
+  host_dir: /data/vmagent
+  scrape_config: "{{ host_dir }}/scrapeconfigs.yml"
+  listen_port: 8429
+
+vminsert:
+  image: victoriametrics/vminsert:v1.99.0-cluster
+  host_dir: /data/vminsert
+  listen_port: 8480
+
+vmselect: # http://<vmselect>:8481/select/<accountID>/vmui/
+  image: victoriametrics/vmselect:v1.99.0-cluster
+  host_dir: /data/vmselect
+  listen_port: 8481

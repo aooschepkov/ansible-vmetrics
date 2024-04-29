@@ -1,0 +1,14 @@
+---
+- name: Create vmstorage directory
+  ansible.builtin.file:
+    path: "{{ vmstorage_dir }}"
+    state: directory
+    owner: "{{ vmuser }}"
+    group: "{{ vmgroup }}"
+    mode: '0644'
+
+- name: Template systemd unit file
+  ansible.builtin.template:
+    src: vmstorage.yml
+    dest: /etc/systemd/system/vmstorage.service
+    mode: '0755'

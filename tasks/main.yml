@@ -1,0 +1,12 @@
+---
+- name: Ensure user exists
+  ansible.builtin.include_tasks:
+    file: user.yml
+    apply:
+      become: true
+
+- name: Setup vmstorage
+  ansible.builtin.include_tasks:
+    file: vmstorage.yml
+    apply:
+      become: true
