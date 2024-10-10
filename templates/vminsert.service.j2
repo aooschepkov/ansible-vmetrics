@@ -1,0 +1,21 @@
+[Unit]
+Description=Victoria Metrics component
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker rm --force vminsert
+ExecStart=/usr/bin/docker run --rm \
+    --name vminsert \
+    -p {{ vminsert.api_port }}:8480 \
+    {{ vminsert.image }} \
+    -storageNode={%- for host in groups['vmstorage'] -%}
+    {{ hostvars[host]['inventory_hostname'] }}:{{ vmstorage.vminsert_port }}{% if not loop.last %},{% endif %}
+    {%- endfor %}
+
+ExecStop=/usr/bin/docker stop -t 10 vminsert
+ExecReload=/usr/bin/docker kill -SIGHUP vminsert
+
+[Install]
+WantedBy=multi-user.target

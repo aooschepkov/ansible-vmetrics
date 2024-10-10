@@ -1,25 +1,41 @@
 ---
-vmuser: victoriametrics
-vmgroup: victoriametrics
-
 vmstorage:
-  image: victoriametrics/vmstorage:v1.99.0-cluster
-  host_dir: /data/vmstorage
-  retention_period: 30d
-  listen_port: 8428
-
-vmagent:
-  image: victoriametrics/vmagent:v1.99.0
-  host_dir: /data/vmagent
-  scrape_config: "{{ host_dir }}/scrapeconfigs.yml"
-  listen_port: 8429
+  image: victoriametrics/vmstorage:v1.104.0-cluster
+  host_dir: /var/lib/data/vmstorage
+  retention_period: 365d
+  api_port: 8482 # Listen port for vmstorage HTTP endpoints
+  vminsert_port: 8400 # TCP port to accept connections from vminsert services
+  vmselect_port: 8401 # TCP port to accept connections from vmselect services
+  # extra_flags: {
+  #   # retentionFilter: '{job="istiod"}:3d'
+  # }
 
 vminsert:
-  image: victoriametrics/vminsert:v1.99.0-cluster
-  host_dir: /data/vminsert
-  listen_port: 8480
+  image: victoriametrics/vminsert:v1.104.0-cluster
+  api_port: 8480
+  # -replicationFactor int
+  #    Replication factor for the ingested data, i.e. how many copies to make among distinct -storageNode instances. Note that vmselect must run with -dedup.minScrapeInterval=1ms for data de-duplication when replicationFactor is greater than 1. Higher values for -dedup.minScrapeInterval at vmselect is OK (default 1)
+  #  -relabelConfig string
 
-vmselect: # http://<vmselect>:8481/select/<accountID>/vmui/
-  image: victoriametrics/vmselect:v1.99.0-cluster
+vmagent:
+  image: victoriametrics/vmagent:v1.104.0
+  host_dir: /data/vmagent
+  scrape_config: "{{ host_dir }}/scrapeconfigs.yml"
+  api_port: 8429
+
+vmselect:
+  image: victoriametrics/vmselect:v1.104.0-cluster
   host_dir: /data/vmselect
-  listen_port: 8481
+  api_port: 8481
+
+vmauth:
+  image: victoriametrics/vmauth:v1.104.0
+  api_port: 8427
+  host_dir: /data/vmauth
+  listen_addr: "" # Virtual IP address to listen on for HA setup.
+  install_keepalived: false
+
+vmalert:
+  image: victoriametrics/vmalert:v1.104.0
+  api_port: 8880
+  host_dir: /data/vmalert

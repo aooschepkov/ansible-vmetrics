@@ -1,0 +1,23 @@
+[Unit]
+Description=Victoria Metrics component
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker rm --force vmselect
+ExecStart=/usr/bin/docker run --rm \
+    --name vmselect \
+    -p {{ vmselect.api_port }}:8481 \
+    {{ vmselect.image }} \
+    -selectNode={%- for host in groups['vminsert'] -%}
+    {{ hostvars[host]['inventory_hostname'] }}:{{ vminsert.api_port }}{% if not loop.last %},{% endif %}
+    {%- endfor %} \
+    -storageNode={%- for host in groups['vmstorage'] -%}
+    {{ hostvars[host]['inventory_hostname'] }}:{{ vmstorage.vmselect_port }}{% if not loop.last %},{% endif %}
+    {%- endfor %}
+
+ExecStop=/usr/bin/docker stop -t 10 vmselect
+
+[Install]
+WantedBy=multi-user.target

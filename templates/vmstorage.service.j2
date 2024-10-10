@@ -7,15 +7,15 @@ After=docker.service
 Restart=always
 ExecStartPre=-/usr/bin/docker rm --force vmstorage
 ExecStart=/usr/bin/docker run --rm \
-    -n vmstorage \
-    -u {{ vmuser }} \
-    -p {{ vmstorage.listen_port }}:8428 \
-    -v {{ vmstorage.host_dir }}:/data \
-    {{ vmstorage.image }} \ 
-    -retentionPeriod {{ vmstorage.retention_period }}
+    --name vmstorage \
+    -p {{ vmstorage.api_port }}:8482 \
+    -p {{ vmstorage.vminsert_port }}:8400 \
+    -p {{ vmstorage.vmselect_port }}:8401 \
+    -v {{ vmstorage.host_dir }}:/vmstorage-data:rw \
+    {{ vmstorage.image }} \
+    -retentionPeriod={{ vmstorage.retention_period }}
 
 ExecStop=/usr/bin/docker stop -t 10 vmstorage
-{# ExecReload= #}
 
 [Install]
-WantedBy=multu-user.target
+WantedBy=multi-user.target

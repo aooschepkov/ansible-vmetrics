@@ -1,0 +1,19 @@
+[Unit]
+Description=Victoria Metrics agent
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker rm --force vmauth
+ExecStart=/usr/bin/docker run --rm \
+    --name vmauth \
+    -p {{ vmauth.listen_port }}:8429 \
+    -v {{ vmauth.host_dir }}:/data \
+    {{ vmauth.image }}
+
+ExecStop=/usr/bin/docker stop -t 10 vmauth
+ExecReload=/usr/bin/docker kill -SIGHUP vmauth
+
+[Install]
+WantedBy=multi-user.target

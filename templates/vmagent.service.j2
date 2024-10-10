@@ -7,16 +7,16 @@ After=docker.service
 Restart=always
 ExecStartPre=-/usr/bin/docker rm --force vmagent
 ExecStart=/usr/bin/docker run --rm \
-    -n vmagent \
-    -u {{ vmuser }} \
+    --name vmagent \
     -p {{ vmagent.listen_port }}:8429 \
     -v {{ vmagent.host_dir }}:/data \
     {{ vmagent.image }} \ 
     -promscrape.config=/data/scrapeconfigs.yml \
-    -remoteWrite.url=https://vmstorage:8428/api/v1/write {# or vminsert uri ?? #}
+    -remoteWrite.url=https://<vminsert-host>:8480/insert/0/prometheus/api/v1/write \
+    -promscrape.cluster.name
 
 ExecStop=/usr/bin/docker stop -t 10 vmagent
-{# ExecReload= #}
+ExecReload=/usr/bin/docker kill -SIGHUP vmagent
 
 [Install]
-WantedBy=multu-user.target
+WantedBy=multi-user.target
