@@ -1,0 +1,32 @@
+global_defs {
+  router_id {{ ansible_hostname }}
+}
+
+vrrp_script chk_vmauth {
+    script "killall -0 vmauth"
+    interval 2
+    weight 2
+}
+
+vrrp_instance VI_1 {
+  {% if ansible_hostname == groups['vmauth'][0] %}
+  state MASTER
+  {% else %}
+  state BACKUP
+  {% endif %}
+  interface {{ ansible_default_ipv4.interface }}
+  virtual_router_id 1
+  {% if ansible_hostname == groups['vmauth'][0] %}
+  priority 101
+  {% else %}
+  priority 100
+  {% endif %}
+
+  virtual_ipaddress {
+    {{ vmauth.keepalived_vip }}
+  }
+
+  track_script {
+    chk_vmauth
+  }
+}

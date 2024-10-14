@@ -1,0 +1,11 @@
+---
+- name: Install keepalived
+  ansible.builtin.package:
+    name: keepalived
+    state: present
+
+- name: Template keepalived config
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    mode: '0644'

@@ -8,7 +8,7 @@ Restart=always
 ExecStartPre=-/usr/bin/docker rm --force vmauth
 ExecStart=/usr/bin/docker run --rm \
     --name vmauth \
-    -p {{ vmauth.listen_port }}:8429 \
+    -p {{ vmauth.api_port }}:8429 \
     -v {{ vmauth.host_dir }}:/data \
     {{ vmauth.image }}
 

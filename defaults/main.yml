@@ -19,9 +19,9 @@ vminsert:
 
 vmagent:
   image: victoriametrics/vmagent:v1.104.0
+  api_port: 8429
   host_dir: /data/vmagent
   scrape_config: "{{ host_dir }}/scrapeconfigs.yml"
-  api_port: 8429
 
 vmselect:
   image: victoriametrics/vmselect:v1.104.0-cluster
@@ -32,8 +32,8 @@ vmauth:
   image: victoriametrics/vmauth:v1.104.0
   api_port: 8427
   host_dir: /data/vmauth
-  listen_addr: "" # Virtual IP address to listen on for HA setup.
-  install_keepalived: false
+  keepalived_vip: "192.168.88.88" # Virtual IP address to listen on for HA setup.
+  install_keepalived: false # Use already installed Keepalived
 
 vmalert:
   image: victoriametrics/vmalert:v1.104.0

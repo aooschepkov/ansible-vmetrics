@@ -1,0 +1,24 @@
+---
+- name: Template systemd unit file
+  ansible.builtin.template:
+    src: vmauth.service.j2
+    dest: /etc/systemd/system/vmauth.service
+    mode: '0644'
+
+- name: Ensure vmauth directory exists
+  ansible.builtin.file:
+    dest: "{{ vmauth.host_dir }}"
+    state: directory
+    mode: '0644'
+
+- name: Template vmauth config
+  ansible.builtin.template:
+    src: vmauth.yaml.j2
+    dest: "{{ vmauth.host_dir }}/vmauth.yaml"
+    mode: '0644'
+
+- name: Enable and start vmauth
+  ansible.builtin.systemd:
+    name: vmauth
+    daemon_reload: true
+    state: started

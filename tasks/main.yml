@@ -16,3 +16,17 @@
     file: vmselect.yml
     apply:
       become: true
+
+- name: Setup vmauth
+  ansible.builtin.include_tasks:
+    file: vmauth.yml
+    apply:
+      become: true
+  tags:
+    - vmauth
+
+- name: Setup keepalived
+  ansible.builtin.include_tasks:
+    file: keepalived.yml
+    apply:
+      become: true
